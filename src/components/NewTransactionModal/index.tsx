@@ -1,5 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowCircleDown, ArrowCircleUp, X } from "phosphor-react";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
+import { useTransactionsContext } from "../../contexts/TransactionsContext";
 import {
   CloseButton,
   Content,
@@ -7,9 +11,6 @@ import {
   TransactionType,
   TransactionTypeButton,
 } from "./styles";
-import * as z from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 const newTransactionFormSchema = z.object({
   description: z.string(),
@@ -21,18 +22,32 @@ const newTransactionFormSchema = z.object({
 type NewTransactionsFormInputs = z.infer<typeof newTransactionFormSchema>;
 
 export function NewTransactionModal() {
+  const { createTransaction } = useTransactionsContext();
+
   const {
     control,
     register,
     handleSubmit,
     formState: { isSubmitting },
+    reset,
   } = useForm<NewTransactionsFormInputs>({
     resolver: zodResolver(newTransactionFormSchema),
+    defaultValues: {
+      type: "income",
+    },
   });
 
   async function handleCreateNewTransaction(data: NewTransactionsFormInputs) {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log(data);
+    const { category, description, price, type } = data;
+
+    await createTransaction({
+      description,
+      price,
+      category,
+      type,
+    });
+
+    reset();
   }
 
   return (
@@ -70,7 +85,6 @@ export function NewTransactionModal() {
             control={control}
             name="type"
             render={({ field }) => {
-              console.log(field);
               return (
                 <TransactionType
                   onValueChange={field.onChange}
