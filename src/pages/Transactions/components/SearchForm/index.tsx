@@ -5,7 +5,6 @@ import { useContextSelector } from 'use-context-selector'
 import * as z from 'zod'
 import { TransactionsContext } from '../../../../contexts/TransactionsContext'
 import { SearchFormContainer } from './styles'
-import { memo } from 'react'
 
 const searchFormSchema = z.object({
   query: z.string(),
@@ -13,7 +12,7 @@ const searchFormSchema = z.object({
 
 type SearchFormInputs = z.infer<typeof searchFormSchema>
 
-function SearchFormComponent() {
+export function SearchForm() {
   const fetchTransactions = useContextSelector(
     TransactionsContext,
     (context) => {
@@ -47,5 +46,3 @@ function SearchFormComponent() {
     </SearchFormContainer>
   )
 }
-
-export const SearchForm = memo(SearchFormComponent)
